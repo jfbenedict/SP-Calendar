@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_jsb_sp_calendar.CalendarData</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Gets calendar data for rendering in the Service Portal calendar widget and pages</description>
+        <name>CalendarData</name>
+        <script><![CDATA[var CalendarData = Class.create();
+CalendarData.prototype = {
+    initialize: function() {
+    },
+	
+	getCalendarDefs : function(inputCalendars) {
+		var returnList = [];
+		var fDefRecord = new GlideRecord("x_jsb_sp_calendar_sp_calendar_configuration");
+		fDefRecord.addQuery("active", true);
+		if ( inputCalendars ) {
+			if ( inputCalendars.length > 0 ) {
+				fDefRecord.addEncodedQuery("sys_idIN"+inputCalendars.join(","));
+			}
+		}
+		fDefRecord.orderBy("order");
+		fDefRecord.query();
+		while ( fDefRecord.next() ) {
+			var bInclude = true;
+			if ( fDefRecord.advanced == true && fDefRecord.script.nil() ) { //Advanced without a script
+				bInclude = false;
+			}
+			
+			if ( fDefRecord.advanced == false && fDefRecord.table.nil() ) { //Non-Advanced without a table
+				bInclude = false;
+			}
+			
+			if ( !fDefRecord.user_criteria.nil() && bInclude ) {
+				var aUCs = fDefRecord.getValue("user_criteria").split(",");
+				if ( !sn_uc.UserCriteriaLoader.userMatches(gs.getUserID(), aUCs) ) {
+					bInclude = false;
+				}
+			}
+			
+			if ( bInclude ) {
+				returnList.push({
+					sys_id:fDefRecord.getUniqueValue(),
+					label:fDefRecord.getDisplayValue(),
+					order:fDefRecord.getValue("order"),
+					color:fDefRecord.getValue("background_color") || "#555",
+					textColor:fDefRecord.getValue("text_color") || "#FFF",
+					selected:true
+				});
+			}
+		}
+		
+		return returnList;
+	},
+	
+	_getDefRecord : function(recordID) {
+		if ( recordID ) {
+			var fDefRecord = new GlideRecord("x_jsb_sp_calendar_sp_calendar_configuration");
+			if ( fDefRecord.get(recordID)  ){
+				return fDefRecord;
+			}
+		}
+		return null;
+	},
+	
+	getEvents : function(calDefs) {
+		if ( !calDefs ) {
+			calDefs = this.getCalendarDefs();
+		}
+		var returnList = [];
+		var arrayUtil = new global.ArrayUtil();
+		for ( var i=0; i<calDefs.length; i++ ) {
+			if ( calDefs[i].selected == false ) {
+				continue;
+			}
+			var fDefRecord = this._getDefRecord(calDefs[i].sys_id); 
+			if ( fDefRecord.advanced == true ) {				
+				arrayUtil.concat(returnList, this._getEventsFromScript(fDefRecord));
+			} else {
+				if ( fDefRecord.getValue("table") != "" ) {
+					var mapDef = this._getAttributeMap(fDefRecord);
+					var orderByField = null;
+					if ( typeof mapDef.start != "undefined" ) {
+						orderByField = mapDef.start;
+					}
+					
+					var fSourceRec = new GlideRecord(fDefRecord.getValue("table"));
+					fSourceRec.addEncodedQuery(fDefRecord.getValue("conditions"));
+					if ( orderByField ) {
+						fSourceRec.orderBy(orderByField);
+					}
+					fSourceRec.query();
+					while ( fSourceRec.next() ) {
+						if ( fSourceRec.canRead() || fDefRecord.bypass_read_test == true ) {
+							var eventObj = this._buildEventFromRec(fSourceRec, fDefRecord);
+							returnList.push(eventObj);
+						}
+					}
+				}
+			}
+		}
+		
+		return returnList;
+	},
+	
+	_getAttributeMap : function(fDefRecord) {
+		var defaultMap = {"title":"title","start":"start_date","end":"end_date"};
+		if ( !fDefRecord ) {
+			return defaultMap;
+		}
+		var mapDef = defaultMap;
+		if ( !fDefRecord.attribute_map.nil() ) {
+			mapDef = new global.JSON().decode(fDefRecord.getValue("attribute_map"));
+		}
+		
+		return mapDef;
+	},
+	
+	_buildEventFromRec : function(fRecord, fDefRecord) {
+		var mapDef = this._getAttributeMap(fDefRecord);
+		var returnObj = {};
+		for ( var mapKey in mapDef ) {
+			var sourceValue = "";
+			var sourceAttribute = mapDef[mapKey];
+			if ( mapKey == "url" ) {
+				sourceValue = sourceAttribute;
+				sourceValue = this._replaceTokens(sourceValue, fRecord, true);				
+			} else {
+				if ( fRecord.isValidField(sourceAttribute) ) {
+					sourceValue = fRecord.getDisplayValue(sourceAttribute); //May need to handle date formats
+				} else {
+					sourceValue = this._replaceTokens(sourceAttribute, fRecord);
+				}
+			}
+			returnObj[mapKey] = sourceValue;
+		}
+		if ( !fDefRecord.background_color.nil() ) {
+			returnObj.color = fDefRecord.getValue("background_color");
+		}
+		
+		if ( !fDefRecord.text_color.nil() ) {
+			returnObj.textColor = fDefRecord.getValue("text_color");
+		}
+		returnObj.id = fRecord.getUniqueValue();
+		returnObj.category = {sys_id:fDefRecord.getUniqueValue(),label:fDefRecord.getDisplayValue("label")};
+		
+		return returnObj;
+	},
+	
+	_replaceTokens: function(value, fRecord, bUseValues) {
+		if ( !bUseValues ) {
+			bUseValues = false;
+		}
+        try {
+            var keys = value.match(/\${(.+?)\}/g);
+            if (keys && keys.length > 0) {
+                var keyValueMap = {};
+                for (var i = 0; i < keys.length; i++) {
+                    if (keyValueMap[keys[i]]) {
+                        continue;
+                    }
+                    var fieldName = keys[i].substring(keys[i].indexOf('${') + 2, keys[i].indexOf('}')).trim();
+					if ( fieldName.indexOf(".")>-1 ) {
+						var dotWalk = fieldName.split(".");
+						if ( fRecord.isValidField(dotWalk[0]) ) {
+							var fRefRecord = fRecord[dotWalk[0]].getRefRecord();
+							if ( fRefRecord.isValidField(dotWalk[1]) ) {
+								if ( bUseValues ) {
+									keyValueMap[keys[i]] = fRefRecord.getValue(dotWalk[1]);	
+								} else {
+									keyValueMap[keys[i]] = fRefRecord.getDisplayValue(dotWalk[1]);
+								}
+							}
+						}
+					} else {
+						if ( fRecord.isValidField(fieldName) ) {
+							if ( bUseValues ) {
+								keyValueMap[keys[i]] = fRecord.getValue(fieldName);
+							} else {
+								keyValueMap[keys[i]] = fRecord.getDisplayValue(fieldName);
+							}
+						}
+					}
+					
+                    if (!keyValueMap[keys[i]]) {
+                        keyValueMap[keys[i]] = '';
+                    }
+                    value = value.replaceAll(keys[i], keyValueMap[keys[i]]);
+                }
+            }
+        } catch (e) {
+            return value;
+        }
+        return value;
+    },
+	
+	_getEventsFromScript : function(fDefRecord) {
+		var events = [];
+		if ( fDefRecord.script.nil() ) {
+			return events;
+		}
+		
+		var templateEvent = {
+			"category": {
+				"label": fDefRecord.getDisplayValue(),
+				"sys_id": fDefRecord.getUniqueValue()
+			},
+			"color": fDefRecord.getValue("background_color"),
+			"textColor": fDefRecord.getValue("text_color")
+		};
+		
+		var evaluator = new GlideScopedEvaluator();
+		evaluator.putVariable('current', fDefRecord);
+		evaluator.putVariable('events', events);
+		evaluator.putVariable("templateEvent", templateEvent);
+		evaluator.evaluateScript(fDefRecord, "script", null);
+		return evaluator.getVariable('events');
+	},
+
+    type: 'CalendarData'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
+        <sys_created_on>2022-08-16 21:49:05</sys_created_on>
+        <sys_id>7860f16687ddd9508a7955b73cbb3580</sys_id>
+        <sys_mod_count>33</sys_mod_count>
+        <sys_name>CalendarData</sys_name>
+        <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
+        <sys_update_name>sys_script_include_7860f16687ddd9508a7955b73cbb3580</sys_update_name>
+        <sys_updated_by>jsbenedict@kpmg.com</sys_updated_by>
+        <sys_updated_on>2022-08-17 23:22:04</sys_updated_on>
+    </sys_script_include>
+</record_update>

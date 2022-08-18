@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_rel_widget_clone">
+    <sp_rel_widget_clone action="INSERT_OR_UPDATE">
+        <child display_value="SP Calendar">815da16a879dd9508a7955b73cbb35ba</child>
+        <cloned>2022-08-16 21:35:11</cloned>
+        <last_validated>2022-08-16 21:35:11</last_validated>
+        <parent display_value="Calendar Demo">ff570781df121200ba13a4836bf26353</parent>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;sp_widget&gt;&lt;category/&gt;&lt;client_script&gt;&lt;![CDATA[function() {
+  // widget controller
+  var c = this;
+	// i am a horrible person doing this in a controller
+	// with an ID no less!
+	$('#calendar-demo').fullCalendar({
+			timeZone: 'UTC',
+			eventColor: '#555',
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay',
+			},
+			events:c.data.events
+	})
+}]]&gt;&lt;/client_script&gt;&lt;controller_as&gt;c&lt;/controller_as&gt;&lt;css&gt;.training {
+  background:#000;
+  color:white;
+}&lt;/css&gt;&lt;data_table&gt;sp_instance&lt;/data_table&gt;&lt;demo_data/&gt;&lt;description/&gt;&lt;docs/&gt;&lt;field_list/&gt;&lt;has_preview&gt;true&lt;/has_preview&gt;&lt;id&gt;calendar-demo&lt;/id&gt;&lt;internal&gt;false&lt;/internal&gt;&lt;link/&gt;&lt;name&gt;Calendar Demo&lt;/name&gt;&lt;option_schema/&gt;&lt;public&gt;false&lt;/public&gt;&lt;roles/&gt;&lt;script&gt;&lt;![CDATA[(function() {
+	
+	data.events = [
+		{'start':new GlideDateTime().getDisplayValue(),
+		 'duration':'04:00',
+		 'title':"Test"
+		},
+		{
+      start: '2022-08-10 16:00:00',
+      end: '2022-08-10 16:30:00',
+      display: 'block',
+			allDay: false,
+			editable:false,
+			title:"Hello",
+			color:"#eee",
+			textColor:"#555"
+    }
+	];
+	
+})();]]&gt;&lt;/script&gt;&lt;servicenow&gt;false&lt;/servicenow&gt;&lt;sys_class_name&gt;sp_widget&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2016-03-20 03:06:39&lt;/sys_created_on&gt;&lt;sys_id&gt;ff570781df121200ba13a4836bf26353&lt;/sys_id&gt;&lt;sys_mod_count&gt;28&lt;/sys_mod_count&gt;&lt;sys_name&gt;Calendar Demo&lt;/sys_name&gt;&lt;sys_package display_value="Service Portal - Calendar" source="com.glide.service-portal.calendar"&gt;9f6e9a311bbc1110c13554a2604bcb86&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;&lt;sys_update_name&gt;sp_widget_ff570781df121200ba13a4836bf26353&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;jsbenedict@kpmg.com&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2022-08-16 20:59:15&lt;/sys_updated_on&gt;&lt;template&gt;&lt;![CDATA[&lt;div&gt;
+  &lt;h4&gt;Hey, where's my calendar?&lt;/h4&gt;
+  &lt;div id="calendar-demo"&gt;&lt;/div&gt;
+&lt;/div&gt;]]&gt;&lt;/template&gt;&lt;/sp_widget&gt;</payload>
+        <sys_class_name>sp_rel_widget_clone</sys_class_name>
+        <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
+        <sys_created_on>2022-08-16 21:35:11</sys_created_on>
+        <sys_id>c55dadae879dd9508a7955b73cbb3586</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>815da16a879dd9508a7955b73cbb35ba</sys_name>
+        <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
+        <sys_update_name>sp_rel_widget_clone_c55dadae879dd9508a7955b73cbb3586</sys_update_name>
+        <sys_updated_by>jsbenedict@kpmg.com</sys_updated_by>
+        <sys_updated_on>2022-08-16 21:35:11</sys_updated_on>
+    </sp_rel_widget_clone>
+</record_update>

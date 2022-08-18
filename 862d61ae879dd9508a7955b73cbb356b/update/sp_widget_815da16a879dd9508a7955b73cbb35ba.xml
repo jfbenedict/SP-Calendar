@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($window, $location) {
+  // widget controller
+  var c = this;
+	
+	c.show_calendars = false;
+	var initialViewLoad = true;
+	
+	function getCurrentView() {
+		return $('#calendar-demo').fullCalendar("getView");
+	}
+	
+	function eventClickCustom(eventObj, event) {
+		if (eventObj.url) {
+			if ( eventObj.url.startsWith("?") ) {
+				$location.url(eventObj.url);
+			} else {
+				$window.open(eventObj.url);
+			}			
+			event.preventDefault();
+		} else {
+			alert('You clicked ' + eventObj.title+', this will be a modal of more information');
+		}
+	}
+	
+	function calendarSelector() {
+		c.show_calendars = !c.show_calendars;
+	}
+	
+	function addCalendarBadge() {
+		var html = '<span class="calendar-badge badge">'+c.data.calendar_types.length+'</span>';
+		$(".fc-calendarSelectBtn-button").append(html);
+	}
+	
+	function viewRenderChange() {
+		if ( initialViewLoad ) {
+			initialViewLoad = false;
+			return;
+		}
+		var newView = getCurrentView().name;
+		saveUserPreference(c.data.page_id+".view", newView);
+	}
+	
+	function renderCalendar(bRefresh) {
+		var defaultView = c.data.default_view;
+		if ( bRefresh ) {
+			defaultView = getCurrentView().name;
+			$('#calendar-demo').fullCalendar("destroy");
+		}
+		$('#calendar-demo').fullCalendar({
+			eventColor: c.options.event_color,
+			weekends:c.data.show_weekends,
+			defaultView:defaultView,
+			customButtons: {
+				calendarSelectBtn: {
+					text: 'Calendars',
+					icon:'calendar fa fa-calendar',
+					click: calendarSelector
+				}
+			},
+			header: {
+				left: c.data.header_left_items,
+				center: 'title',
+				right: c.options.views
+			},
+			buttonText : {
+				today:'${Today}',
+				week:'${Week}',
+				month:'${Month}',
+				day:'${Day}'
+			},
+			eventClick: eventClickCustom,
+			viewRender:viewRenderChange,
+			eventRender: function(event, element) {
+				if ( c.data.show_tooltips ) {
+					if ( event.description && event.title != event.description ) {
+						$(element).tooltip({
+							title: "<b>"+event.title + "</b><p>"+event.description+"</p>",
+							html: true,
+							container: "body"
+						});
+					}
+				}
+			},
+			eventLimit: true,
+			events:c.data.events
+		});
+		if ( c.data.calendar_types.length>1 ) {
+			addCalendarBadge();
+		}
+	}
+	
+	function saveUserPreference(name, value) {
+		c.server.get({
+			action: "storeUserPref",
+			preference_name : name,
+			preference_value : value
+		}).then(function(response) {
+		});
+	}
+	
+	c.refreshData = function() {
+		c.server.get({
+			calendar_types: c.data.calendar_types,
+			action:"refresh"
+		}).then(function(response) {
+			c.data = response.data;
+			renderCalendar(true);
+		});
+	};
+	
+	c.adjustSelectedCalendars = function() {
+		var selectedCals = [];
+		for ( var x=0; x<c.data.calendar_types.length; x++ ) {
+			if ( c.data.calendar_types[x].selected ) {
+				selectedCals.push(c.data.calendar_types[x].sys_id);
+			}
+		}
+		saveUserPreference(c.data.page_id+".calendars", selectedCals.join(","));
+		c.refreshData();
+	};
+	
+	renderCalendar();
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.training {
+  background:#000;
+  color:white;
+}
+
+.fc-icon-calendar:after {
+}
+
+.calendar-badge {
+  position: absolute;
+  top: -6px;
+  font-size: 10px;
+  padding-left: 5px;
+  padding-right: 6px;
+  background:$primary;
+  color:white;
+}
+
+.calendar-selector {
+  background: #eee;
+  z-index: 10;
+  position: absolute;
+  top: 75px;
+  min-height: 350px;
+  border: 1px solid #ddd;
+  border-bottom-right-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  //box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+}
+
+.calendar-selector .title-bar {
+  padding-bottom:1rem;
+  padding-left:15px;
+  padding-right:15px;
+}
+
+.calendar-selector .selection-content {
+  padding: 15px;
+}
+
+.relative {
+  position:relative;
+}
+
+.calendar-container {
+  background:white;
+  padding:15px;
+  margin-top:15px;
+  position:relative;
+  border-top:3px solid $primary;
+}
+
+.calendar-container .fc-toolbar {
+  margin-top:10px;
+}
+
+/* Toggle Switch CSS */
+.selection-content ol {
+  list-style: none;
+}
+
+.selection-content label {
+  cursor: pointer;
+}
+
+.selection-content [type="checkbox"] {
+  position: absolute;
+  left: -9999px;
+}
+
+.selection-content .switches {
+  max-width: 500px;
+  width: 95%;
+  padding:0;
+  margin-left:0;
+}
+
+.selection-content .switches li {
+  position: relative;
+  min-width: 220px;
+  margin-bottom: 10px;
+}
+
+/*
+.selection-content .switches li::before {
+  content: counter(switchCounter);
+  position: absolute;
+  top: 50%;
+  left: -30px;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--pink);
+}
+*/
+
+.selection-content .switches label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selection-content .switches span:last-child {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  border-radius: 15px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4);
+  background: #eee;
+  transition: all 0.3s;
+  margin-left: 10px;
+}
+
+.selection-content .switches span:last-child::before,
+.selection-content .switches span:last-child::after {
+  content: "";
+  position: absolute;
+}
+
+.selection-content .switches span:last-child::before {
+  left: 1px;
+  top: 1px;
+  width: 24px;
+  height: 24px;
+  background: #e8e9ed;
+  border-radius: 50%;
+  z-index: 1;
+  transition: transform 0.3s;
+}
+
+.selection-content .switches span:last-child::after {
+  top: 50%;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  transform: translateY(-50%);
+  background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/uncheck-switcher.svg);
+  background-size: 12px 12px;
+}
+
+.selection-content .switches [type="checkbox"]:checked + label span:last-child {
+  background: $brand-success;
+}
+
+.selection-content .switches [type="checkbox"]:checked + label span:last-child::before {
+  transform: translateX(24px);
+}
+
+.selection-content .switches [type="checkbox"]:checked + label span:last-child::after {
+  width: 14px;
+  height: 14px;
+  /*right: auto;*/
+  left: 8px;
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/162656/checkmark-switcher.svg);
+  background-size: 14px 14px;
+}
+
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>sp_calendar</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>SP Calendar</name>
+        <option_schema>[{"name":"event_color","section":"Presentation","default_value":"#555","label":"Default Event Color","type":"string"},{"name":"views","section":"Presentation","default_value":"month,agendaWeek,agendaDay","label":"Views","type":"string"},{"name":"default_view","section":"Presentation","default_value":"month","label":"Default View","type":"string"},{"name":"show_weekends","section":"Presentation","default_value":"true","label":"Show Weekends","type":"boolean"},{"displayValue":"SP Calendar Configuration","name":"calendars","display_value_list":[],"section":"Data","label":"Calendars","type":"glide_list","value":"x_jsb_sp_calendar_sp_calendar_configuration","ed":{"reference":"x_jsb_sp_calendar_sp_calendar_configuration"}},{"name":"show_tooltips","section":"Presentation","default_value":"true","label":"Show Tooltips","type":"boolean"}]</option_schema>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+	
+	var util = new x_jsb_sp_calendar.CalendarData();
+	data.show_weekends = (options.show_weekends == "true");
+	data.show_tooltips = (options.show_tooltips == "true");
+	data.input_calendars = [];
+	if ( options.calendars ) {
+		data.input_calendars = options.calendars.split(",");
+	}
+	
+	var bRefresh = false;
+	if ( input ) {
+		if ( input.action == "refresh" && input.calendar_types ) {
+			data.calendar_types = input.calendar_types;
+			bRefresh = true;
+		} else {
+			processAction(input, util);
+			return;
+		}
+	} else {
+		data.calendar_types = util.getCalendarDefs(data.input_calendars);
+	}
+	data.header_left_items = "prev,next  today";
+	if ( data.calendar_types.length>1 ) {
+		data.header_left_items = "calendarSelectBtn  "+data.header_left_items;
+	}
+	
+	data.page_id = $sp.getParameter("id");
+	data.default_view = options.default_view;
+	var userObj = gs.getUser();
+	var userViewPref = userObj.getPreference(data.page_id+".view");
+	if ( userViewPref != null && userViewPref != '' ) {
+		data.default_view = userViewPref;
+	}
+	
+	if ( !bRefresh ) {
+		/* Adjust calendar types selected based off preference */	
+		var userCalPref = userObj.getPreference(data.page_id+".calendars");
+		if ( userCalPref != null && userCalPref != '' ) {
+			var calendarList = userCalPref.split(",");
+			for ( var x=0; x<data.calendar_types.length; x++ ) {
+				data.calendar_types[x].selected = (calendarList.indexOf(data.calendar_types[x].sys_id)>-1);
+			}
+		}
+	}
+	data.events = util.getEvents(data.calendar_types);
+	
+})();
+
+function processAction(input, util) {
+	if ( input.action == "storeUserPref" ) {
+		var currentUser = gs.getUser(); 
+		currentUser.savePreference(input.preference_name, input.preference_value); 
+	}
+}]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
+        <sys_created_on>2022-08-16 21:35:11</sys_created_on>
+        <sys_id>815da16a879dd9508a7955b73cbb35ba</sys_id>
+        <sys_mod_count>107</sys_mod_count>
+        <sys_name>SP Calendar</sys_name>
+        <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
+        <sys_update_name>sp_widget_815da16a879dd9508a7955b73cbb35ba</sys_update_name>
+        <sys_updated_by>jsbenedict@kpmg.com</sys_updated_by>
+        <sys_updated_on>2022-08-17 21:06:40</sys_updated_on>
+        <template><![CDATA[<div class="calendar-container">
+  <div class="m-t-sm" ng-if="c.data.calendar_types.length>1 && c.show_calendars" class="calendar-selector">
+    <h5 class="title-bar b-b">
+      Calendars
+      <a href ng-click="c.show_calendars = false" class="text-muted pull-right">
+        <i class="fa fa-times"></i>
+      </a>
+    </h5>
+    <div class="selection-content">
+      <ol class="switches">
+        <li ng-repeat="calType in c.data.calendar_types|orderBy:'order'">
+          <input type="checkbox" id="{{::calType.sys_id}}" aria-label="{{::calType.label}}" aria-checked="{{calType.selected}}" ng-model="calType.selected" ng-true-value="true" ng-false-value="false" ng-model-options="{getterSetter: true}" ng-click="c.adjustSelectedCalendars()">
+          <label for="{{::calType.sys_id}}">
+            <span>
+              <i class="fa fa-circle" ng-style="{color:calType.color}"></i>
+              {{::calType.label}}
+            </span>
+            <span></span>
+          </label>
+        </li>
+      </ol>
+      
+    </div>
+  </div>
+  
+  <div id="calendar-demo"></div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

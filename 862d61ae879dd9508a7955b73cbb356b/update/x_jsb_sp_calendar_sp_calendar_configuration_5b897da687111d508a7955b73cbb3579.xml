@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="x_jsb_sp_calendar_sp_calendar_configuration">
+    <x_jsb_sp_calendar_sp_calendar_configuration action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <advanced>true</advanced>
+        <attribute_map/>
+        <background_color>#333579</background_color>
+        <bypass_read_test>false</bypass_read_test>
+        <conditions/>
+        <description>Scripted example of getting public holiday information for US from a web-service and showing on a calendar</description>
+        <label>US Holidays</label>
+        <name>US Holidays</name>
+        <order>200</order>
+        <script><![CDATA[/* Variables passed into script
+	current = This SP Calendar Configuration Record
+	templateEvent = JSON Object framing the standard calendar configuration event information
+	events = Empty array of events to be updated and displayed on the calendar
+*/
+
+/* Using the following public API for holiday information https://date.nager.at/api/v2/publicholidays/2022/US */
+var year = new GlideDateTime().getYearUTC();
+var r = new sn_ws.RESTMessageV2();
+r.setHttpMethod("GET");
+var sEndPoint = "https://date.nager.at/api/v2/publicholidays/"+year+"/US";
+r.setEndpoint(sEndPoint);
+var response = r.execute();
+var responseBody = response.getBody();
+var httpStatus = response.getStatusCode();
+if ( httpStatus == "200") {
+	var holidayEvents = new global.JSON().decode(responseBody);
+	for ( var x=0; x<holidayEvents.length; x++ ) {
+		if ( holidayEvents[x].global ) {
+			var eventObj = JSON.parse(JSON.stringify(templateEvent)); //Template event is passed as a variable to the script and contains base information
+			eventObj.id = "us_holiday_"+x;
+			eventObj.start = holidayEvents[x].date;
+			eventObj.allDay = true;
+			eventObj.title = holidayEvents[x].localName;
+			eventObj.description = holidayEvents[x].name;
+			if ( holidayEvents[x].launchYear ) {
+				eventObj.description += "<p>Launched in "+ holidayEvents[x].launchYear+"</p>";
+			}
+			events.push(eventObj); //events variable is passed into script as an empty array and what is retrieved
+		}
+	}
+}
+]]></script>
+        <sys_class_name>x_jsb_sp_calendar_sp_calendar_configuration</sys_class_name>
+        <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
+        <sys_created_on>2022-08-16 22:28:34</sys_created_on>
+        <sys_id>5b897da687111d508a7955b73cbb3579</sys_id>
+        <sys_mod_count>23</sys_mod_count>
+        <sys_name>US Holidays</sys_name>
+        <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
+        <sys_update_name>x_jsb_sp_calendar_sp_calendar_configuration_5b897da687111d508a7955b73cbb3579</sys_update_name>
+        <sys_updated_by>jsbenedict@kpmg.com</sys_updated_by>
+        <sys_updated_on>2022-08-17 23:16:16</sys_updated_on>
+        <table/>
+        <text_color>#FFFFFF</text_color>
+        <user_criteria>2f137fb2eb303010e0ef83c45e52287c,cb8e06e9d7103100f2d224837e610339</user_criteria>
+    </x_jsb_sp_calendar_sp_calendar_configuration>
+</record_update>

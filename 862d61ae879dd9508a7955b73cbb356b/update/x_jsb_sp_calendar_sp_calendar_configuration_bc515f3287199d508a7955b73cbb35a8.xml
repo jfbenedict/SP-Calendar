@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="x_jsb_sp_calendar_sp_calendar_configuration">
+    <x_jsb_sp_calendar_sp_calendar_configuration action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <advanced>false</advanced>
+        <attribute_map>{"title":"${user.name}","start":"employment_start_date","allDay":"true","url":"?id=user_profile&amp;sys_id=${user}","description":"${user.title} | ${user.location}"}</attribute_map>
+        <background_color>#2E8B57</background_color>
+        <bypass_read_test>false</bypass_read_test>
+        <conditions table="sn_hr_core_profile">user.active=true^employment_start_date&gt;=javascript:gs.beginningOfLast60Days()^EQ<item endquery="false" field="user.active" goto="false" newquery="false" operator="=" or="false" value="true"/>
+            <item endquery="false" field="employment_start_date" goto="false" newquery="false" operator="&gt;=" or="false" value="javascript:gs.beginningOfLast60Days()"/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </conditions>
+        <description>Show all newly hired employees in the last 60 days or more</description>
+        <label>New Hires</label>
+        <name>New Hires</name>
+        <order>400</order>
+        <script/>
+        <sys_class_name>x_jsb_sp_calendar_sp_calendar_configuration</sys_class_name>
+        <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
+        <sys_created_on>2022-08-17 23:30:33</sys_created_on>
+        <sys_id>bc515f3287199d508a7955b73cbb35a8</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>New Hires</sys_name>
+        <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
+        <sys_update_name>x_jsb_sp_calendar_sp_calendar_configuration_bc515f3287199d508a7955b73cbb35a8</sys_update_name>
+        <sys_updated_by>jsbenedict@kpmg.com</sys_updated_by>
+        <sys_updated_on>2022-08-17 23:48:45</sys_updated_on>
+        <table>sn_hr_core_profile</table>
+        <text_color>#FFFFFF</text_color>
+        <user_criteria>7f0370019f22120047a2d126c42e7061,cb8e06e9d7103100f2d224837e610339</user_criteria>
+    </x_jsb_sp_calendar_sp_calendar_configuration>
+</record_update>
