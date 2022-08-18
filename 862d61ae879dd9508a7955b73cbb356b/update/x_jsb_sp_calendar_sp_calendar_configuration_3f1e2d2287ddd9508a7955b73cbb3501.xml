@@ -5,9 +5,7 @@
         <attribute_map>{"title":"title","start":"start_date","end":"end_date","url":"?id=community_event&amp;sys_id=${sys_id}","description":"description"}</attribute_map>
         <background_color>#FFBF00</background_color>
         <bypass_read_test>false</bypass_read_test>
-        <conditions table="sn_communities_event">active=true^start_date&gt;=javascript:gs.beginningOfLast90Days()^EQ<item endquery="false" field="active" goto="false" newquery="false" operator="=" or="false" value="true"/>
-            <item endquery="false" field="start_date" goto="false" newquery="false" operator="&gt;=" or="false" value="javascript:gs.beginningOfLast90Days()"/>
-            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        <conditions table="sn_communities_event">active=true^start_date&gt;=javascript:gs.beginningOfLast90Days()^EQ<item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
         </conditions>
         <description>All community events plotted on a calendar</description>
         <label>Community Events</label>

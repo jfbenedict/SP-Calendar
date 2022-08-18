@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_scope_privilege">
+    <sys_scope_privilege action="INSERT_OR_UPDATE">
+        <operation>execute</operation>
+        <source_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</source_scope>
+        <status>allowed</status>
+        <sys_class_name>sys_scope_privilege</sys_class_name>
+        <sys_created_by>jbenedict</sys_created_by>
+        <sys_created_on>2022-08-18 16:25:40</sys_created_on>
+        <sys_id>aea9ba0b97111110df2079100153af34</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Glide API: table metadata</sys_name>
+        <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
+        <sys_update_name>sys_scope_privilege_aea9ba0b97111110df2079100153af34</sys_update_name>
+        <sys_updated_by>jbenedict</sys_updated_by>
+        <sys_updated_on>2022-08-18 16:25:40</sys_updated_on>
+        <target_name>Glide API: table metadata</target_name>
+        <target_scope display_value="Global">global</target_scope>
+        <target_type>scriptable</target_type>
+    </sys_scope_privilege>
+</record_update>

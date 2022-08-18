@@ -3,7 +3,7 @@
         <child display_value="SP Calendar">815da16a879dd9508a7955b73cbb35ba</child>
         <cloned>2022-08-16 21:35:11</cloned>
         <last_validated>2022-08-16 21:35:11</last_validated>
-        <parent display_value="Calendar Demo">ff570781df121200ba13a4836bf26353</parent>
+        <parent display_value="">ff570781df121200ba13a4836bf26353</parent>
         <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;sp_widget&gt;&lt;category/&gt;&lt;client_script&gt;&lt;![CDATA[function() {
   // widget controller
   var c = this;

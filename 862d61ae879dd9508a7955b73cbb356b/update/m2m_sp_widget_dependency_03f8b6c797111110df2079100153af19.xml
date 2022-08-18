@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update table="m2m_sp_widget_dependency">
     <m2m_sp_widget_dependency action="INSERT_OR_UPDATE">
-        <sp_dependency display_value="fullcalendar">644cfb85df121200ba13a4836bf2633d</sp_dependency>
+        <sp_dependency display_value="sp_calendar.fullcalendar">e2a83ac797111110df2079100153af75</sp_dependency>
         <sp_widget display_value="SP Calendar">815da16a879dd9508a7955b73cbb35ba</sp_widget>
         <sys_class_name>m2m_sp_widget_dependency</sys_class_name>
-        <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
-        <sys_created_on>2022-08-16 21:35:11</sys_created_on>
-        <sys_id>415dadae879dd9508a7955b73cbb3583</sys_id>
+        <sys_created_by>jbenedict</sys_created_by>
+        <sys_created_on>2022-08-18 16:22:42</sys_created_on>
+        <sys_id>03f8b6c797111110df2079100153af19</sys_id>
         <sys_mod_count>0</sys_mod_count>
-        <sys_name>fullcalendar.SP Calendar</sys_name>
+        <sys_name>sp_calendar.fullcalendar.SP Calendar</sys_name>
         <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
         <sys_policy/>
         <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
-        <sys_update_name>m2m_sp_widget_dependency_415dadae879dd9508a7955b73cbb3583</sys_update_name>
-        <sys_updated_by>jsbenedict@kpmg.com</sys_updated_by>
-        <sys_updated_on>2022-08-16 21:35:11</sys_updated_on>
+        <sys_update_name>m2m_sp_widget_dependency_03f8b6c797111110df2079100153af19</sys_update_name>
+        <sys_updated_by>jbenedict</sys_updated_by>
+        <sys_updated_on>2022-08-18 16:22:42</sys_updated_on>
     </m2m_sp_widget_dependency>
 </record_update>
