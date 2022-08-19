@@ -29,15 +29,15 @@
         <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
         <sys_created_on>2022-08-16 21:34:26</sys_created_on>
         <sys_id>862d61ae879dd9508a7955b73cbb356b</sys_id>
-        <sys_mod_count>3</sys_mod_count>
+        <sys_mod_count>4</sys_mod_count>
         <sys_updated_by>jbenedict</sys_updated_by>
-        <sys_updated_on>2022-08-18 16:46:15</sys_updated_on>
+        <sys_updated_on>2022-08-19 20:23:12</sys_updated_on>
         <template/>
         <trackable>true</trackable>
         <uninstall_blocked>false</uninstall_blocked>
         <user_role display_value="x_jsb_sp_calendar.admin" name="x_jsb_sp_calendar.admin">23fd25ee879dd9508a7955b73cbb35c4</user_role>
         <vendor/>
         <vendor_prefix/>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </sys_app>
 </record_update>

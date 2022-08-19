@@ -7,12 +7,21 @@
 	
 	c.show_calendars = false;
 	var initialViewLoad = true;
+	var calendar = null;
 	
 	function getCurrentView() {
-		return $('#calendar-demo').fullCalendar("getView");
+		if (calendar && calendar.view) {
+			return calendar.view.type;
+		}
+		
+		return "dayGridMonth";
+		//return $('#calendar-demo').fullCalendar("getView");
 	}
 	
-	function eventClickCustom(eventObj, event) {
+	function eventClickCustom(info) {
+		var eventObj = info.event;
+		var event = info.jsEvent;
+		
 		if (eventObj.url) {
 			if ( eventObj.url.startsWith("?") ) {
 				$location.url(eventObj.url);
@@ -39,28 +48,32 @@
 			initialViewLoad = false;
 			return;
 		}
-		var newView = getCurrentView().name;
+		var newView = getCurrentView();
 		saveUserPreference(c.data.page_id+".view", newView);
 	}
 	
 	function renderCalendar(bRefresh) {
 		var defaultView = c.data.default_view;
 		if ( bRefresh ) {
-			defaultView = getCurrentView().name;
-			$('#calendar-demo').fullCalendar("destroy");
+			defaultView = getCurrentView();
+			if (calendar && calendar.fullCalendar) {
+				calendar.fullCalendar('destroy');
+			}
+			//$('#calendar-demo').fullCalendar("destroy");
 		}
-		$('#calendar-demo').fullCalendar({
+		var calendarOptions = {
+			themeSystem: 'standard',
 			eventColor: c.options.event_color,
 			weekends:c.data.show_weekends,
-			defaultView:defaultView,
+			initialView:defaultView,
 			customButtons: {
 				calendarSelectBtn: {
-					text: 'Calendars',
+					text: '${Calendars}',
 					icon:'calendar fa fa-calendar',
 					click: calendarSelector
 				}
 			},
-			header: {
+			headerToolbar: {
 				left: c.data.header_left_items,
 				center: 'title',
 				right: c.options.views
@@ -69,24 +82,33 @@
 				today:'${Today}',
 				week:'${Week}',
 				month:'${Month}',
-				day:'${Day}'
+				day:'${Day}',
+				list:'${List}'
 			},
 			eventClick: eventClickCustom,
-			viewRender:viewRenderChange,
-			eventRender: function(event, element) {
+			datesSet:viewRenderChange,
+			eventDidMount: function(info) {
+				var event = info.event;
+				var element = info.el;
 				if ( c.data.show_tooltips ) {
-					if ( event.description && event.title != event.description ) {
+					if ( event.extendedProps.description && event.title != event.extendedProps.description ) {
 						$(element).tooltip({
-							title: "<b>"+event.title + "</b><p>"+event.description+"</p>",
+							title: "<b>"+event.title + "</b><p>"+event.extendedProps.description+"</p>",
 							html: true,
 							container: "body"
 						});
 					}
 				}
 			},
-			eventLimit: true,
+			dayMaxEventRows: true,
 			events:c.data.events
-		});
+		};
+		
+		var calendarEl = document.getElementById('calendar');
+		calendar = new FullCalendar.Calendar(calendarEl,calendarOptions);
+		calendar.render();
+		
+		//$('#calendar-demo').fullCalendar();
 		if ( c.data.calendar_types.length>1 ) {
 			addCalendarBadge();
 		}
@@ -139,8 +161,9 @@
   font-size: 10px;
   padding-left: 5px;
   padding-right: 6px;
-  background:$primary;
+  background:$info;
   color:white;
+  z-index:2;
 }
 
 .calendar-selector {
@@ -282,7 +305,23 @@
   background-size: 14px 14px;
 }
 
-</css>
+@media (max-width: 768px){
+    .fc-toolbar .fc-left, .fc-toolbar .fc-center, .fc-toolbar .fc-right {
+        display: inline-block;
+        float: none !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .fc .fc-toolbar.fc-header-toolbar {
+        display: block;
+        text-align: center;
+    }
+
+    .fc-header-toolbar .fc-toolbar-chunk {
+        display: block;
+    }
+}</css>
         <data_table>sp_instance</data_table>
         <demo_data/>
         <description/>
@@ -318,9 +357,9 @@
 	} else {
 		data.calendar_types = util.getCalendarDefs(data.input_calendars);
 	}
-	data.header_left_items = "prev,next  today";
+	data.header_left_items = "prev,next,today";
 	if ( data.calendar_types.length>1 ) {
-		data.header_left_items = "calendarSelectBtn  "+data.header_left_items;
+		data.header_left_items = "calendarSelectBtn,"+data.header_left_items;
 	}
 	
 	data.page_id = $sp.getParameter("id");
@@ -356,14 +395,14 @@ function processAction(input, util) {
         <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
         <sys_created_on>2022-08-16 21:35:11</sys_created_on>
         <sys_id>815da16a879dd9508a7955b73cbb35ba</sys_id>
-        <sys_mod_count>107</sys_mod_count>
+        <sys_mod_count>145</sys_mod_count>
         <sys_name>SP Calendar</sys_name>
         <sys_package display_value="SP Calendar" source="x_jsb_sp_calendar">862d61ae879dd9508a7955b73cbb356b</sys_package>
         <sys_policy/>
         <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
         <sys_update_name>sp_widget_815da16a879dd9508a7955b73cbb35ba</sys_update_name>
-        <sys_updated_by>jsbenedict@kpmg.com</sys_updated_by>
-        <sys_updated_on>2022-08-17 21:06:40</sys_updated_on>
+        <sys_updated_by>jbenedict</sys_updated_by>
+        <sys_updated_on>2022-08-19 20:21:44</sys_updated_on>
         <template><![CDATA[<div class="calendar-container">
   <div class="m-t-sm" ng-if="c.data.calendar_types.length>1 && c.show_calendars" class="calendar-selector">
     <h5 class="title-bar b-b">
@@ -389,7 +428,7 @@ function processAction(input, util) {
     </div>
   </div>
   
-  <div id="calendar-demo"></div>
+  <div id="calendar"></div>
 </div>]]></template>
     </sp_widget>
 </record_update>
