@@ -29,9 +29,6 @@
         <sys_created_by>jsbenedict@kpmg.com</sys_created_by>
         <sys_created_on>2022-08-16 21:34:26</sys_created_on>
         <sys_id>862d61ae879dd9508a7955b73cbb356b</sys_id>
-        <sys_mod_count>4</sys_mod_count>
-        <sys_updated_by>jbenedict</sys_updated_by>
-        <sys_updated_on>2022-08-19 20:23:12</sys_updated_on>
         <template/>
         <trackable>true</trackable>
         <uninstall_blocked>false</uninstall_blocked>

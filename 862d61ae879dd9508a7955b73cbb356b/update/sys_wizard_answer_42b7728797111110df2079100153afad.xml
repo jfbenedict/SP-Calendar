@@ -16,14 +16,11 @@
         <sys_created_by>jbenedict</sys_created_by>
         <sys_created_on>2022-08-18 16:17:10</sys_created_on>
         <sys_id>42b7728797111110df2079100153afad</sys_id>
-        <sys_mod_count>0</sys_mod_count>
         <sys_name>SP Calendar Configuration</sys_name>
         <sys_package display_value="Global" source="global">global</sys_package>
         <sys_policy/>
         <sys_scope display_value="SP Calendar">862d61ae879dd9508a7955b73cbb356b</sys_scope>
         <sys_update_name>sys_wizard_answer_42b7728797111110df2079100153afad</sys_update_name>
-        <sys_updated_by>jbenedict</sys_updated_by>
-        <sys_updated_on>2022-08-18 16:17:10</sys_updated_on>
         <table/>
         <target_url>x_jsb_sp_calendar_sp_calendar_configuration.do</target_url>
         <type>1</type>
